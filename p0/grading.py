@@ -68,8 +68,8 @@ class Grades:
       if len(incompleted) > 0:
           prereq = incompleted.pop()
           print \
-"""*** NOTE: Make sure to complete Question %s before working on Question %s,
-*** because Question %s builds upon your answer for Question %s.
+"""- NOTE: Make sure to complete Question %s before working on Question %s,
+- because Question %s builds upon your answer for Question %s.
 """ % (prereq, q, q, prereq)
           continue
 
@@ -256,7 +256,7 @@ to follow your instructor's guidelines to receive credit on your project.
         checkOrX = checkOrX,
         points = self.points[q]
       )
-      # print "*** output for Question %s " % q[1]
+      # print "- output for Question %s " % q[1]
       # print output
       edxOutput.write(output)
     edxOutput.write("</div>")
@@ -289,13 +289,13 @@ to follow your instructor's guidelines to receive credit on your project.
     if not raw:
         # We assume raw messages, formatted for HTML, are printed separately
         if self.mute: util.unmutePrint()
-        print '*** ' + message
+        print '- ' + message
         if self.mute: util.mutePrint()
         message = cgi.escape(message)
     self.messages[self.currentQuestion].append(message)
 
   def addMessageToEmail(self, message):
-    print "WARNING**** addMessageToEmail is deprecated %s" % message
+    print "WARNING*- addMessageToEmail is deprecated %s" % message
     for line in message.split('\n'):
       pass
       #print '%%% ' + line + ' %%%'

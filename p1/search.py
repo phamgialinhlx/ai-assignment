@@ -132,7 +132,6 @@ def breadthFirstSearch(problem):
             for successor in list:
                 if not successor[0] in explored:
                     tracepath[successor] = presentSuccessor
-                    
                     successorQueue.push(successor)
                     # if not successor in tracepath.keys():
         
@@ -148,8 +147,42 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    pq = PriorityQueue()
+    presentState = problem.getStartState()
+    explored = set()
+    explored.add(presentState)
+    tracepath = {}
+    cost = {}
+    goalSuccessor = None
+
+    list = [successor for successor in problem.getSuccessors(presentState)]
+    for successor in list:
+        pq.push(successor, successor[2])
+        cost[successor] = successor[2]
+    while (not problem.isGoalState(presentState)):
+        presentSuccessor = pq.pop()
+        presentState = presentSuccessor[0]
+        if (not presentState in explored):
+            explored.add(presentState)
+
+            if (problem.isGoalState(presentState)):
+                goalSuccessor = presentSuccessor
+                break
+            list = [successor for successor in problem.getSuccessors(presentState)]
+            for successor in list:
+                if not successor[0] in explored:
+                    tracepath[successor] = presentSuccessor
+                    cost[successor] = successor[2] + cost[presentSuccessor]
+                    pq.push(successor, cost[successor])
+    
+    path = []
+    while goalSuccessor in tracepath.keys():
+        path.append(goalSuccessor[1])
+        goalSuccessor = tracepath[goalSuccessor]
+    path.append(goalSuccessor[1])
+    path.reverse()
+    return path
 
 def nullHeuristic(state, problem=None):
     """
@@ -160,8 +193,42 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    "- YOUR CODE HERE ***"
+    from util import PriorityQueue
+    pq = PriorityQueue()
+    presentState = problem.getStartState()
+    explored = set()
+    explored.add(presentState)
+    tracepath = {}
+    cost = {}
+    goalSuccessor = None
+    list = [successor for successor in problem.getSuccessors(presentState)]
+    for successor in list:
+        pq.push(successor, heuristic(successor[0], problem) + successor[2]) 
+        cost[successor] = successor[2]
+    while (not problem.isGoalState(presentState)):
+        presentSuccessor = pq.pop()
+        presentState = presentSuccessor[0]
+        if (not presentState in explored):
+            explored.add(presentState)
+            if (problem.isGoalState(presentState)):
+                goalSuccessor = presentSuccessor
+                break
+            list = [successor for successor in problem.getSuccessors(presentState)]
+            for successor in list:
+                if (not successor[0] in explored):
+                    tracepath[successor] = presentSuccessor
+                    cost[successor] = successor[2] + cost[presentSuccessor]
+                    pq.push(successor, heuristic(successor[0], problem) + cost[successor])
+    
+    path = []
+    while goalSuccessor in tracepath.keys():
+        path.append(goalSuccessor[1])
+        goalSuccessor = tracepath[goalSuccessor]
+    path.append(goalSuccessor[1])
+    path.reverse()
+    # print(path)
+    return path
 
 
 # Abbreviations
