@@ -34,6 +34,7 @@ description for details.
 Good luck and happy searching!
 """
 
+from turtle import position
 from game import Directions
 from game import Agent
 from game import Actions
@@ -457,6 +458,88 @@ class AStarFoodSearchAgent(SearchAgent):
     def __init__(self):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
+        
+def firstApproach(state):
+    # 0/4
+    position, foodGrid = state
+    h = 0
+    foodList = foodGrid.asList()
+    for i in range(len(foodList)):
+        # if (not state[1][i]):
+        _h = abs(position[0] - foodList[i][0]) + abs(position[1] - foodList[i][1])             
+        if (h > _h):
+            h = _h
+    return h
+
+class GameState:
+    def __init__(self, walls, startState):
+        self.walls = walls
+        self.startState = startState
+    
+    def getWalls(self):
+        return self.walls
+    
+    def getPacmanPosition(self):
+        return self.startState
+
+def farthestApproach(state, problem):
+    # 3/4 manhattan
+    # 5/4 mazeDistance
+    position, foodGrid = state
+    h = 0
+    foodList = foodGrid.asList()
+    for i in range(len(foodList)):
+        # if (not state[1][i]):
+        # _h = manhattan(position, foodList[i])
+        _h = mazeDistance(position, foodList[i], GameState(problem.walls, position))
+        if (h < _h):
+            h = _h
+    return h
+
+def manhattan(point1, point2):
+    return abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
+
+def nns(state):
+    position, foodGrid = state
+    minHeuristic = 10e8
+    foodList = foodGrid.asList()
+
+
+    if (len(foodList) == 0):
+        return 0
+
+    if (len(foodList) == 1):
+        return firstApproach(state)
+
+    for food in foodList:
+        visited = []
+        visited.append(food)
+        _heuristic = 0
+        currentNode = food
+        while (True):
+            minH = 10e8
+            minFood = currentNode
+            minFood = currentNode
+            for _food in foodList:
+                if not _food in visited:
+                    # print("[nns()] enter if")
+                    h = manhattan(_food, currentNode)
+                    # print("[nns()] h: ", h)
+                    if minH > h:
+                        minH = h
+                        minFood = _food
+            visited.append(minFood)
+            currentNode = minFood
+            _heuristic = _heuristic + minH
+            # print(len(visited))
+            # print(len(foodList))
+            # print()
+            if (len(visited) == len(foodList)):
+                break
+
+        if (minHeuristic > _heuristic):
+            minHeuristic = _heuristic
+    return firstApproach(state) + minHeuristic
 
 def foodHeuristic(state, problem):
     """
@@ -486,16 +569,9 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
-    h = 0
-    foodList = foodGrid.asList()
-    # print(foodGrid.asList())
-    for i in range(len(foodList)):
-        # if (not state[1][i]):
-        _h = abs(position[0] - foodList[i][0]) + abs(position[1] - foodList[i][1])             
-        if (h < _h):
-            h = _h
-    return h
+    # return firstApproach(state)
+    return farthestApproach(state, problem)
+    # return nns(state)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
